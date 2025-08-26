@@ -1,40 +1,56 @@
-import { useState } from "react";
+import { useState} from "react";
+import type { ChangeEvent, FormEvent } from "react";
+
+
+// Define the Product type
+interface Product {
+  name: string;
+  category: string;
+  quantity: string;
+  price: string;
+  description: string;
+}
+
+// Define possible validation errors
+interface ProductErrors {
+  name?: string;
+  category?: string;
+  quantity?: string;
+  price?: string;
+}
 
 export default function AddProduct() {
-  const [product, setProduct] = useState({
+  const [product, setProduct] = useState<Product>({
     name: "",
     category: "",
     quantity: "",
     price: "",
-    description: ""
+    description: "",
   });
 
-  const [products, setProducts] = useState([]); 
-  
+  const [products, setProducts] = useState<Product[]>([]); 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ProductErrors>({});
   const [message, setMessage] = useState("");
 
-
-  
-  const handleChange = (e) => {
+  // Handle input changes with typing
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-  
+
     setProduct((prev) => {
       const updated = {
         ...prev,
         [name]: value,
       };
-  
+
       console.log("Current Product Values:", updated);
       return updated;
     });
   };
-  
-  
 
-  const validate = () => {
-    const newErrors = {};
+  // Validation logic with type safety
+  const validate = (): ProductErrors => {
+    const newErrors: ProductErrors = {};
     if (!product.name.trim()) newErrors.name = "Product name is required.";
     if (!product.category.trim()) newErrors.category = "Category is required.";
     if (!product.quantity || Number(product.quantity) <= 0)
@@ -44,7 +60,8 @@ export default function AddProduct() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submission with typing
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const validationErrors = validate();
@@ -53,13 +70,13 @@ export default function AddProduct() {
       return; // stop submission
     }
 
-    setErrors({}); // clear old errors
+    setErrors({});
     setIsSubmitting(true);
     setMessage("✅ Product added successfully!");
-    // clear the message after 2 seconds
+
     setTimeout(() => {
       setMessage("");
-    }, 1000);
+    }, 2000);
 
     setProducts((prev) => [...prev, product]);
 
@@ -68,7 +85,13 @@ export default function AddProduct() {
 
     setTimeout(() => {
       setIsSubmitting(false);
-      setProduct({ name: "", category: "", quantity: "", price: "", description: "" });
+      setProduct({
+        name: "",
+        category: "",
+        quantity: "",
+        price: "",
+        description: "",
+      });
     }, 800);
   };
 
@@ -137,7 +160,7 @@ export default function AddProduct() {
             {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
           </div>
 
-          {/* Description (optional, no validation) */}
+          {/* Description */}
           <textarea
             name="description"
             placeholder="Description"
@@ -162,9 +185,8 @@ export default function AddProduct() {
       </div>
 
       {/* Success Message */}
-      {message && (
-        <p className="text-green-600 font-medium mt-2">{message}</p>
-      )}
+      {message && <p className="text-green-600 font-medium mt-2">{message}</p>}
+
       {/* Products Table */}
       <div className="max-w-3xl mx-auto p-6 bg-dark-blue-100 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-4">All Products</h2>
